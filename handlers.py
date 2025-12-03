@@ -140,7 +140,17 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
             if data == "back_main":
                 BOT.edit_message_text("Back to main menu.", c.message.chat.id, c.message.message_id, reply_markup=main_kb(uid))
                 return
-
+          
+            if data == "menu_doubt":
+                MY_CONTACT = "@Bossssss191"
+                BOT.edit_message_text(
+                    f"❓ For doubts contact:\n{MY_CONTACT}\n{CONTACT_BOT}",
+                    c.message.chat.id,
+                    c.message.message_id,
+                    reply_markup=back_button("back_main")
+                )
+                return
+            
             if data == "menu_loots":
                 if not check_joined(uid):
                     kb2 = InlineKeyboardMarkup()
@@ -238,18 +248,6 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
                         BOT.send_message(c.message.chat.id, item["text"])
 
                 return
-
-                  
-            if data == "menu_doubt":
-                MY_CONTACT = "@Beyond_Unknown1"  # Your username
-                BOT.edit_message_text(
-                    f"❓ For doubts contact:\n{MY_CONTACT}\n{CONTACT_BOT}",
-                    c.message.chat.id,
-                    c.message.message_id,
-                    reply_markup=back_button("back_main")
-                )
-                return
-            return
 
             if data == "menu_admin":
                 if not is_admin(uid):
