@@ -29,6 +29,11 @@ CREATE TABLE IF NOT EXISTS users (
     user_id INTEGER PRIMARY KEY
 )
 """)
+c.execute("""
+CREATE TABLE IF NOT EXISTS admins (
+    uid INTEGER PRIMARY KEY
+)
+""")
 conn.commit()
 
 
@@ -97,4 +102,27 @@ def delete_media(media_id):
 
 def get_media_by_id(media_id):
     c.execute("SELECT loot_id, kind, type, file_id, link, text_msg FROM media WHERE id=?", (media_id,))
+    
+def add_admin(uid):
+    conn2 = sqlite3.connect(DB_FILE)
+    c2 = conn2.cursor()
+    c2.execute("INSERT OR IGNORE INTO admins(uid) VALUES (?)", (uid,))
+    conn2.commit()
+    conn2.close()
+
+def remove_admin(uid):
+    conn2 = sqlite3.connect(DB_FILE)
+    c2 = conn2.cursor()
+    c2.execute("DELETE FROM admins WHERE uid=?", (uid,))
+    conn2.commit()
+    conn2.close()
+
+def get_admins():
+    conn2 = sqlite3.connect(DB_FILE)
+    c2 = conn2.cursor()
+    c2.execute("SELECT uid FROM admins")
+    rows = c2.fetchall()
+    conn2.close()
+    return [r[0] for r in rows]
+   
     return c.fetchone()
