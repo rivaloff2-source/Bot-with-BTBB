@@ -167,7 +167,6 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
                 if not admins:
                     BOT.send_message(uid, "No admins to remove.")
                     return
-
                  kb = InlineKeyboardMarkup()
                  for a in admins:
                     kb.add(InlineKeyboardButton(str(a), callback_data=f"owner_do_remove||{a}"))
