@@ -44,7 +44,7 @@ def admin_kb(uid):
 if uid == OWNER_ID:
     kb.add(InlineKeyboardButton("➕ Add Admin", callback_data="owner_add_admin"))
     kb.add(InlineKeyboardButton("➖ Remove Admin", callback_data="owner_remove_admin"))
-    kb.add(InlineKeyboardButton("📋 View Admins", callback_data="owner_view_admins")
+    kb.add(InlineKeyboardButton("📋 View Admins", callback_data="owner_view_admins"))
    
     kb.add(InlineKeyboardButton("⬅ Back", callback_data="back_main"))
     return kb
