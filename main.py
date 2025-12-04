@@ -11,6 +11,8 @@ if not BOT_TOKEN:
 ADMIN_ID = int(os.environ.get("ADMIN_ID", "0"))
 ADMIN_IDS = [ADMIN_ID] if ADMIN_ID != 0 else []
 
+BOT_TOKEN = "8241908340:AAHGKanrbnNxTRCQVKITiglZwLtjA96WRRw"
+ADMIN_IDS = [6000971026]
 REQUIRED_CHANNEL = "@BTBB_ERA"
 CONTACT_BOT = "@Govindchoudharybot"
 
