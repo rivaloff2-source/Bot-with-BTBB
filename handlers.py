@@ -41,11 +41,12 @@ def admin_kb(uid):
     kb.add(InlineKeyboardButton("🗑 Delete Loot (full)", callback_data="admin_delete_loot"))
     kb.add(InlineKeyboardButton("🗑 Delete Videos/Proofs", callback_data="admin_delete_items"))
     kb.add(InlineKeyboardButton("📣 Broadcast", callback_data="admin_broadcast"))
-if uid == OWNER_ID:
-    kb.add(InlineKeyboardButton("➕ Add Admin", callback_data="owner_add_admin"))
-    kb.add(InlineKeyboardButton("➖ Remove Admin", callback_data="owner_remove_admin"))
-    kb.add(InlineKeyboardButton("📋 View Admins", callback_data="owner_view_admins"))
-   
+
+    if uid == OWNER_ID:
+        kb.add(InlineKeyboardButton("➕ Add Admin", callback_data="owner_add_admin"))
+        kb.add(InlineKeyboardButton("➖ Remove Admin", callback_data="owner_remove_admin"))
+        kb.add(InlineKeyboardButton("📋 View Admins", callback_data="owner_view_admins"))
+    
     kb.add(InlineKeyboardButton("⬅ Back", callback_data="back_main"))
     return kb
 
