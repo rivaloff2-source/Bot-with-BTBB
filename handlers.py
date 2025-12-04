@@ -123,13 +123,13 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
         
         if check_joined(uid):
             # User already joined - show welcome and main menu
-            BOT.send_message(m.chat.id, "Welcome to LOOT WITH BTBB_BOT🤩🤩🤩           Made by @Beyond_Unknown1\n\nChoose an option:", reply_markup=main_kb(uid))
+            BOT.send_message(m.chat.id, "Welcome to LOOT WITH BTBB_BOT 🤩🤩🤩\n\nChoose an option:", reply_markup=main_kb(uid))
         else:
             # User hasn't joined - ask them to join first
             kb = InlineKeyboardMarkup()
             kb.add(InlineKeyboardButton("I Joined ✅", callback_data="verify_at_start"))
             kb.add(InlineKeyboardButton("⬅ Back", callback_data="back_main"))
-            BOT.send_message(m.chat.id, f"Welcome to LOOT WITH BTBB_BOT🤩🤩🤩           Made by @Beyond_Unknown1\n\nPlease join {REQUIRED_CHANNEL} first to access earning loots.", reply_markup=kb)
+            BOT.send_message(m.chat.id, f"Welcome to LOOT WITH BTBB_BOT 🤩🤩🤩\n\nPlease join {REQUIRED_CHANNEL} first to access earning loots.", reply_markup=kb)
 
     @BOT.callback_query_handler(func=lambda c: True)
     def cb(c):
@@ -177,7 +177,7 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
             if data == "verify_at_start":
                 if check_joined(uid):
                     BOT.answer_callback_query(c.id, "Verified ✅")
-                    BOT.edit_message_text("Welcome to LOOT WITH BTBB_BOT🤩🤩🤩           Made by @Beyond_Unknown1\n\nChoose an option:", c.message.chat.id, c.message.message_id, reply_markup=main_kb(uid))
+                    BOT.edit_message_text("Welcome to LOOT WITH BTBB_BOT 🤩🤩🤩\n\nChoose an option:", c.message.chat.id, c.message.message_id, reply_markup=main_kb(uid))
                 else:
                     BOT.answer_callback_query(c.id, "Still not joined.")
                 return
