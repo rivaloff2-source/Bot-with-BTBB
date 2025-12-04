@@ -172,20 +172,20 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
                 for a in admins:
                     kb.add(InlineKeyboardButton(str(a), callback_data=f"owner_do_remove||{a}"))
      
-                 BOT.send_message(uid, "Select an admin to remove:", reply_markup=kb)
-                 return
+                BOT.send_message(uid, "Select an admin to remove:", reply_markup=kb)
+                return
 
             if data.startswith("owner_do_remove||") and uid == OWNER_ID:
-                 _, admin_id = data.split("||", 1)
-                 db.remove_admin(int(admin_id))
-                 BOT.send_message(uid, "Admin removed successfully.")
-                 return
+                _, admin_id = data.split("||", 1)
+                db.remove_admin(int(admin_id))
+                BOT.send_message(uid, "Admin removed successfully.")
+                return
 
             if data == "owner_view_admins" and uid == OWNER_ID:
-                 admins = db.get_admins()
-                 text = "👑 Admin List:\n" + "\n".join(str(a) for a in admins) if admins else "No admins found."
-                 BOT.send_message(uid, text)
-                 return
+                admins = db.get_admins()
+                text = "👑 Admin List:\n" + "\n".join(str(a) for a in admins) if admins else "No admins found."
+                BOT.send_message(uid, text)
+                return
 
             if data == "menu_loots":
                 if not check_joined(uid):
