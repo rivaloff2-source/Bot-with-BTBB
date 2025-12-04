@@ -169,7 +169,7 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
                     return
                 
                 kb = InlineKeyboardMarkup()
-                 for a in admins:
+                for a in admins:
                     kb.add(InlineKeyboardButton(str(a), callback_data=f"owner_do_remove||{a}"))
      
                  BOT.send_message(uid, "Select an admin to remove:", reply_markup=kb)
