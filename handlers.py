@@ -9,6 +9,7 @@ BOT = None
 ADMIN_IDS = []
 REQUIRED_CHANNEL = ""
 CONTACT_BOT = ""
+OWNER_ID = []
 temp_states = {}
 
 
@@ -31,7 +32,7 @@ def back_button(cb="back_main"):
     return kb
 
 
-def admin_kb():
+def admin_kb(uid):
     kb = InlineKeyboardMarkup()
     kb.add(InlineKeyboardButton("➕ Add Loot", callback_data="admin_add_loot"))
     kb.add(InlineKeyboardButton("➕ Add Owner Proof", callback_data="admin_add_owner_proof"))
@@ -40,6 +41,11 @@ def admin_kb():
     kb.add(InlineKeyboardButton("🗑 Delete Loot (full)", callback_data="admin_delete_loot"))
     kb.add(InlineKeyboardButton("🗑 Delete Videos/Proofs", callback_data="admin_delete_items"))
     kb.add(InlineKeyboardButton("📣 Broadcast", callback_data="admin_broadcast"))
+if uid == OWNER_ID:
+    kb.add(InlineKeyboardButton("➕ Add Admin", callback_data="owner_add_admin"))
+    kb.add(InlineKeyboardButton("➖ Remove Admin", callback_data="owner_remove_admin"))
+    kb.add(InlineKeyboardButton("📋 View Admins", callback_data="owner_view_admins")
+   
     kb.add(InlineKeyboardButton("⬅ Back", callback_data="back_main"))
     return kb
 
@@ -150,7 +156,37 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
                     reply_markup=back_button("back_main")
                 )
                 return
-            
+
+            if data == "owner_add_admin" and uid == OWNER_ID:
+                temp_states[uid] = {"action": "add_admin"}
+                BOT.send_message(uid, "Send Telegram USER ID of the new admin:")
+                return
+
+            if data == "owner_remove_admin" and uid == OWNER_ID:
+                admins = db.get_admins()
+                if not admins:
+                    BOT.send_message(uid, "No admins to remove.")
+                    return
+
+                 kb = InlineKeyboardMarkup()
+                 for a in admins:
+                    kb.add(InlineKeyboardButton(str(a), callback_data=f"owner_do_remove||{a}"))
+     
+                 BOT.send_message(uid, "Select an admin to remove:", reply_markup=kb)
+                 return
+
+            if data.startswith("owner_do_remove||") and uid == OWNER_ID:
+                 _, admin_id = data.split("||", 1)
+                 db.remove_admin(int(admin_id))
+                 BOT.send_message(uid, "Admin removed successfully.")
+                 return
+
+            if data == "owner_view_admins" and uid == OWNER_ID:
+                 admins = db.get_admins()
+                 text = "👑 Admin List:\n" + "\n".join(str(a) for a in admins) if admins else "No admins found."
+                 BOT.send_message(uid, text)
+                 return
+
             if data == "menu_loots":
                 if not check_joined(uid):
                     kb2 = InlineKeyboardMarkup()
@@ -463,6 +499,18 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
             print("Callback error:", e, traceback.format_exc())
             BOT.answer_callback_query(c.id, "An error occurred")
     @BOT.message_handler(func=lambda m: m.from_user and is_admin(m.from_user.id) and not (m.text and m.text.startswith("/")), content_types=["text", "video", "photo", "document", "audio"])
+    def handle_admin_inputs(m):
+        uid = m.from_user.id
+    
+        if st.get("action") == "add_admin" and uid == OWNER_ID:
+            try:
+                new_admin = int(m.text.strip())
+                db.add_admin(new_admin)
+                BOT.send_message(uid, f"✔ Added {new_admin} as new admin.")
+                temp_states.pop(uid, None)
+            except:
+                BOT.send_message(uid, "Invalid ID! Send numeric Telegram user ID.")
+            return
     def admin_msg(m):
         uid = m.from_user.id
         st = temp_states.get(uid)
