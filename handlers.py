@@ -195,8 +195,8 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
                 if admin_id in ADMIN_IDS:
                     ADMIN_IDS.remove(admin_id)
 
-               BOT.send_message(uid, f"Admin {admin_id} removed successfully.")
-               return
+                BOT.send_message(uid, f"Admin {admin_id} removed successfully.")
+                return
 
 
             if data == "owner_view_admins" and uid == OWNER_ID:
