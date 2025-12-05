@@ -9,7 +9,7 @@ BOT = None
 ADMIN_IDS = []
 REQUIRED_CHANNEL = ""
 CONTACT_BOT = ""
-OWNER_ID = []
+OWNER_ID = 6000971026
 temp_states = {}
 
 
@@ -613,7 +613,7 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
             BOT.send_message(uid, f"❌ Error: {str(e)}")
     @BOT.message_handler(commands=["admin"])
     def cmd_admin(m):
-        if not is_admin(m.from_user.id):
+        if not is_admin(uid):
             BOT.reply_to(m, "You are not an admin.")
             return
-        BOT.send_message(m.chat.id, "👑 Admin Panel:", reply_markup=admin_kb(uid))
+        BOT.send_message(uid, "👑 Admin Panel:", reply_markup=admin_kb(uid))
