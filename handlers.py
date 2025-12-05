@@ -118,7 +118,7 @@ def parse_media(message):
 
 
 def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
-    global BOT, ADMIN_IDS, REQUIRED_CHANNEL, CONTACT_BOT, OWNER_ID
+    global BOT, ADMIN_IDS, REQUIRED_CHANNEL, CONTACT_BOT
 
     BOT = bot_instance
     REQUIRED_CHANNEL = required_channel
