@@ -290,7 +290,7 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
                 if not is_admin(uid):
                     BOT.answer_callback_query(c.id, "Not admin.")
                     return
-                BOT.edit_message_text("👑 Admin Panel", c.message.chat.id, c.message.message_id, reply_markup=admin_kb())
+                BOT.edit_message_text("👑 Admin Panel", c.message.chat.id, c.message.message_id, reply_markup=admin_kb(uid))
                 return
 
             if data == "admin_add_loot":
@@ -616,4 +616,4 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
         if not is_admin(m.from_user.id):
             BOT.reply_to(m, "You are not an admin.")
             return
-        BOT.send_message(m.chat.id, "👑 Admin Panel:", reply_markup=admin_kb())
+        BOT.send_message(m.chat.id, "👑 Admin Panel:", reply_markup=admin_kb(uid))
