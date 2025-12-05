@@ -188,9 +188,16 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
 
             if data.startswith("owner_do_remove||") and uid == OWNER_ID:
                 _, admin_id = data.split("||", 1)
-                db.remove_admin(int(admin_id))
-                BOT.send_message(uid, "Admin removed successfully.")
-                return
+                admin_id = int(admin_id)
+
+                db.remove_admin(admin_id)
+
+               if admin_id in ADMIN_IDS:
+                    ADMIN_IDS.remove(admin_id)
+
+               BOT.send_message(uid, f"Admin {admin_id} removed successfully.")
+               return
+
 
             if data == "owner_view_admins" and uid == OWNER_ID:
                 admins = db.get_admins()
@@ -521,6 +528,10 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
             try:
                 new_admin = int(m.text.strip())
                 db.add_admin(new_admin)
+                
+                if new_admin not in ADMIN_IDS:
+                    ADMIN_IDS.append(new_admin)
+                    
                 BOT.send_message(uid, f"✔ Added {new_admin} as new admin.")
                 temp_states.pop(uid, None)
             except:
