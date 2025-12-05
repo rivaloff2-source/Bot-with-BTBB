@@ -502,6 +502,10 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
     @BOT.message_handler(func=lambda m: m.from_user and is_admin(m.from_user.id) and not (m.text and m.text.startswith("/")), content_types=["text", "video", "photo", "document", "audio"])
     def handle_admin_inputs(m):
         uid = m.from_user.id
+
+        st = temp_states.get(uid)
+        if not st:
+            return
     
         if st.get("action") == "add_admin" and uid == OWNER_ID:
             try:
