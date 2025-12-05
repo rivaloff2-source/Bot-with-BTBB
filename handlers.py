@@ -192,7 +192,7 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
 
                 db.remove_admin(admin_id)
 
-               if admin_id in ADMIN_IDS:
+                if admin_id in ADMIN_IDS:
                     ADMIN_IDS.remove(admin_id)
 
                BOT.send_message(uid, f"Admin {admin_id} removed successfully.")
