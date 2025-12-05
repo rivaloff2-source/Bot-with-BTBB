@@ -118,7 +118,7 @@ def parse_media(message):
 
 
 def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
-    global BOT, ADMIN_IDS, REQUIRED_CHANNEL, CONTACT_BOT
+    global BOT, ADMIN_IDS, REQUIRED_CHANNEL, CONTACT_BOT, OWNER_ID
 
     BOT = bot_instance
     REQUIRED_CHANNEL = required_channel
@@ -127,7 +127,7 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
     ADMIN_IDS = admin_ids.copy()
     
     db_admins = db.get_admins()
-    for a in db_admins():
+    for a in db_admins:
         if a not in ADMIN_IDS:
             ADMIN_IDS.append(a)
 
