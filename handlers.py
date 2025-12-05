@@ -123,11 +123,15 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
     BOT = bot_instance
     REQUIRED_CHANNEL = required_channel
     CONTACT_BOT = contact_bot
+    
     ADMIN_IDS = admin_ids.copy()
     
-    for a in db.get_admins():
+    db_admins = db.get_admins()
+    for a in db_admins():
         if a not in ADMIN_IDS:
             ADMIN_IDS.append(a)
+
+    print("Loaded admins:", ADMIN_IDS)
 
     @BOT.message_handler(commands=["start"])
     def start_cmd(m):
