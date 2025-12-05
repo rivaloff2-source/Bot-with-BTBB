@@ -14,7 +14,7 @@ temp_states = {}
 
 
 def is_admin(uid):
-    return uid in ADMIN_IDS
+    return uid in ADMIN_IDS or OWNER_ID
 
 
 def main_kb(uid):
@@ -34,6 +34,7 @@ def back_button(cb="back_main"):
 
 def admin_kb(uid):
     kb = InlineKeyboardMarkup()
+    
     kb.add(InlineKeyboardButton("➕ Add Loot", callback_data="admin_add_loot"))
     kb.add(InlineKeyboardButton("➕ Add Owner Proof", callback_data="admin_add_owner_proof"))
     kb.add(InlineKeyboardButton("➕ Add Subscriber Proof", callback_data="admin_add_sub_proof"))
@@ -117,11 +118,17 @@ def parse_media(message):
 
 
 def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
-    global BOT, ADMIN_IDS, REQUIRED_CHANNEL, CONTACT_BOT
+    global BOT, ADMIN_IDS, REQUIRED_CHANNEL, CONTACT_BOT, OWNER_ID
+
     BOT = bot_instance
-    ADMIN_IDS = admin_ids
     REQUIRED_CHANNEL = required_channel
     CONTACT_BOT = contact_bot
+    ADMIN_IDS = admin_ids  
+
+    db_admins = db.get_admins()
+    for a in db_admins:
+        if a not in ADMIN_IDS:
+            ADMIN_IDS.append(a)
 
     @BOT.message_handler(commands=["start"])
     def start_cmd(m):
