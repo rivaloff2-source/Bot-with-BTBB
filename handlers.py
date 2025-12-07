@@ -598,33 +598,33 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
 
     
         if action == "broadcast":
-        obj = parse_media(m)
-        if not obj:
-            BOT.send_message(uid, "Invalid message.")
-            return
+            obj = parse_media(m)
+            if not obj:
+                BOT.send_message(uid, "Invalid message.")
+                return
 
-        users = db.get_users()
-        sent = 0
+            users = db.get_users()
+            sent = 0
 
-        for user_id in users:
-            try:
+            for user_id in users:
+                try:
             
-                if obj["type"] == "text":
-                    BOT.send_message(user_id, obj["text"])
+                    if obj["type"] == "text":
+                        BOT.send_message(user_id, obj["text"])
 
             
-                else:
-                    send_media(user_id, obj)
+                    else:
+                        send_media(user_id, obj)
 
-                sent += 1
-                time.sleep(0.05)
-            except:
-                pass
+                    sent += 1
+                    time.sleep(0.05)
+                except:
+                    pass
 
     
-        BOT.send_message(uid, f"Broadcast sent to {sent} users.")
-        temp_states.pop(uid, None)
-        return
+            BOT.send_message(uid, f"Broadcast sent to {sent} users.")
+            temp_states.pop(uid, None)
+            return
 
 
     @BOT.message_handler(commands=["done"])
