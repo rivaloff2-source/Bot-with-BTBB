@@ -52,7 +52,7 @@ def admin_kb(uid):
     return kb
 
 
-def loots_kb():
+def loots_kb(uid):
     kb = InlineKeyboardMarkup()
     for lid, title, desc in db.get_loots():
         kb.add(InlineKeyboardButton(title, callback_data=f"open_loot||{lid}"))
