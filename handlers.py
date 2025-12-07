@@ -516,76 +516,99 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
         except Exception as e:
             print("Callback error:", e, traceback.format_exc())
             BOT.answer_callback_query(c.id, "An error occurred")
-    @BOT.message_handler(func=lambda m: m.from_user and is_admin(m.from_user.id) and not (m.text and m.text.startswith("/")), content_types=["text", "video", "photo", "document", "audio"])
-    def handle_admin_inputs(m):
-        uid = m.from_user.id
-
-        st = temp_states.get(uid)
+    @BOT.message_handler(
+    func=lambda m: m.from_user and is_admin(m.from_user.id) and not(m.text and m.text.startswith("/")),
+    content_types=["text", "video", "photo", "document", "audio"]
+    )
+        def handle_admin_inputs(m):
+            uid = m.from_user.id
+            st = temp_states.get(uid)
+ 
         if not st:
             return
-    
-        if st.get("action") == "add_admin" and uid == OWNER_ID:
+
+        action = st.get("action")
+
+        if action == "add_admin" and uid == OWNER_ID:
             try:
                 new_admin = int(m.text.strip())
+
                 db.add_admin(new_admin)
-                
                 if new_admin not in ADMIN_IDS:
                     ADMIN_IDS.append(new_admin)
-                    
-                BOT.send_message(uid, f"✔ Added {new_admin} as new admin.")
+ 
+                BOT.send_message(uid, f"✔ Added {new_admin} as admin.")
                 temp_states.pop(uid, None)
             except:
-                BOT.send_message(uid, "Invalid ID! Send numeric Telegram user ID.")
+                BOT.send_message(uid, "❌ Invalid ID! Send numeric Telegram user ID.")
             return
-    def admin_msg(m):
-        uid = m.from_user.id
-        st = temp_states.get(uid)
-        if not st:
-            return
-        action = st.get("action")
+
+    
         if action == "add_loot":
             step = st.get("step")
+
             if step == "title":
                 st["title"] = m.text.strip()
                 st["step"] = "desc"
                 temp_states[uid] = st
-                BOT.send_message(uid, "Send description (text).")
+                BOT.send_message(uid, "Send description:")
                 return
+
             if step == "desc":
                 st["description"] = m.text.strip()
                 st["step"] = "media"
                 st["media"] = []
                 temp_states[uid] = st
-                BOT.send_message(uid, "Now send media (video/photo/document/link/text) one by one. When done send /done.")
+                BOT.send_message(uid, "Now send media/link/text. Send /done when finished.")
                 return
+
             if step == "media":
                 obj = parse_media(m)
                 if not obj:
-                    BOT.send_message(uid, "Not a valid media/text/link. Send again or /done to finish.")
+                    BOT.send_message(uid, "❌ Invalid. Send again or /done.")
                     return
                 st["media"].append(obj)
                 temp_states[uid] = st
                 BOT.send_message(uid, f"Saved item #{len(st['media'])}. Send more or /done.")
                 return
-        if action in ("add_owner_proof", "add_sub_proof"):
+
+ 
+        if action == "add_owner_proof":
             loot_id = st.get("loot_id")
             obj = parse_media(m)
-            if not obj:
-                BOT.send_message(uid, "Not valid media/text/link.")
+                if not obj:
+                BOT.send_message(uid, "Invalid media.")
                 return
-            kind = "owner" if action == "add_owner_proof" else "subscriber"
-            # Accumulate proofs in state first, then save on /done
+
             if "proofs" not in st:
                 st["proofs"] = []
             st["proofs"].append(obj)
             temp_states[uid] = st
-            BOT.send_message(uid, f"✔ {kind} proof #{len(st['proofs'])} added. Send more or /done to finish.")
+            BOT.send_message(uid, f"Saved owner proof #{len(st['proofs'])}. Send more or /done.")
             return
+
+
+        if action == "add_sub_proof":
+            loot_id = st.get("loot_id")
+            obj = parse_media(m)
+            if not obj:
+                BOT.send_message(uid, "Invalid media.")
+                return
+
+            if "proofs" not in st:
+                st["proofs"] = []
+            st["proofs"].append(obj)
+            temp_states[uid] = st
+            BOT.send_message(uid, f"Saved subscriber proof #{len(st['proofs'])}. Send more or /done.")
+            return
+
+    
         if action == "broadcast":
             obj = parse_media(m)
             if not obj:
-                BOT.send_message(uid, "Invalid message.")
+                BOT.send_message(uid, "Invalid.")
                 return
+
             users = db.get_users()
             sent = 0
             for user_id in users:
@@ -595,9 +618,11 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
                     time.sleep(0.05)
                 except:
                     pass
-            BOT.send_message(uid, f"📣 Broadcast sent to {sent} users.")
+
+            BOT.send_message(uid, f"Broadcast sent to {sent} users.")
             temp_states.pop(uid, None)
             return
+
     @BOT.message_handler(commands=["done"])
     def cmd_done(m):
         try:
