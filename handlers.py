@@ -107,7 +107,7 @@ def parse_media(m):
     if m.document:
         return {"type": "document", "file_id": m.document.file_id, "caption": m.caption}
     if m.text:
-        return {"type": "text", "file_id": m.text, "caption": None}
+        return {"type": "text", "text": m.text}
     return None
 
 
@@ -598,24 +598,34 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
 
     
         if action == "broadcast":
-            obj = parse_media(m)
-            if not obj:
-                BOT.send_message(uid, "Invalid.")
-                return
-
-            users = db.get_users()
-            sent = 0
-            for user_id in users:
-                try:
-                    send_media(user_id, obj)
-                    sent += 1
-                    time.sleep(0.05)
-                except:
-                    pass
-
-            BOT.send_message(uid, f"Broadcast sent to {sent} users.")
-            temp_states.pop(uid, None)
+        obj = parse_media(m)
+        if not obj:
+            BOT.send_message(uid, "Invalid message.")
             return
+
+        users = db.get_users()
+        sent = 0
+
+        for user_id in users:
+            try:
+            
+                if obj["type"] == "text":
+                    BOT.send_message(user_id, obj["text"])
+
+            
+                else:
+                    send_media(user_id, obj)
+
+                sent += 1
+                time.sleep(0.05)
+            except:
+                pass
+
+    
+        BOT.send_message(uid, f"Broadcast sent to {sent} users.")
+        temp_states.pop(uid, None)
+        return
+
 
     @BOT.message_handler(commands=["done"])
     def finish_admin(m):
@@ -667,7 +677,7 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
         for obj in st.get("proofs", []):
             db.add_media(
                 loot_id,
-                "subscriber",              # CORRECT KIND
+                "subscriber",              
                 obj["type"],
                 file_id=obj.get("file_id"),
                 link=obj.get("link"),
