@@ -655,38 +655,38 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
 
     
         if action == "add_owner_proof":
-        loot_id = st["loot_id"]
+            loot_id = st["loot_id"]
 
-        for obj in st.get("proofs", []):
-            db.add_media(
-                loot_id,
-                "owner",                    
-                obj["type"],               
-                file_id=obj.get("file_id"),
-                link=obj.get("link"),
-                text_msg=obj.get("text")
-            )
+            for obj in st.get("proofs", []):
+                db.add_media(
+                    loot_id,
+                    "owner",                    
+                    obj["type"],               
+                    file_id=obj.get("file_id"),
+                    link=obj.get("link"),
+                    text_msg=obj.get("text")
+                )
 
-        BOT.send_message(uid, "✔ Owner proofs saved.")
-        temp_states.pop(uid, None)
-        return
+            BOT.send_message(uid, "✔ Owner proofs saved.")
+            temp_states.pop(uid, None)
+            return
 
         if action == "add_sub_proof":
-        loot_id = st["loot_id"]
+            loot_id = st["loot_id"]
 
-        for obj in st.get("proofs", []):
-            db.add_media(
-                loot_id,
-                "subscriber",              
-                obj["type"],
-                file_id=obj.get("file_id"),
-                link=obj.get("link"),
-                text_msg=obj.get("text")
-            )
+            for obj in st.get("proofs", []):
+                db.add_media(
+                    loot_id,
+                    "subscriber",              
+                    obj["type"],
+                    file_id=obj.get("file_id"),
+                    link=obj.get("link"),
+                    text_msg=obj.get("text")
+                )
 
-        BOT.send_message(uid, "✔ Subscriber proofs saved.")
-        temp_states.pop(uid, None)
-        return
+            BOT.send_message(uid, "✔ Subscriber proofs saved.")
+            temp_states.pop(uid, None)
+            return
 
     @BOT.message_handler(commands=["admin"])
     def cmd_admin(m):
