@@ -539,9 +539,9 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
  
                 BOT.send_message(uid, f"✔ Added {new_admin} as admin.")
                 temp_states.pop(uid, None)
-             except:
+            except:
                 BOT.send_message(uid, "❌ Invalid ID! Send numeric Telegram user ID.")
-             return
+            return
 
     
         if action == "add_loot":
