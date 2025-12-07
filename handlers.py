@@ -99,21 +99,15 @@ def check_joined(user_id):
         return False
 
 
-def parse_media(message):
-    if message.content_type == "text":
-        t = message.text.strip()
-        if t.startswith("http://") or t.startswith("https://"):
-            return {"type": "link", "link": t}
-        else:
-            return {"type": "text", "text": t}
-    if message.content_type == "video":
-        return {"type": "file", "file_id": message.video.file_id}
-    if message.content_type == "photo":
-        return {"type": "file", "file_id": message.photo[-1].file_id}
-    if message.content_type == "document":
-        return {"type": "file", "file_id": message.document.file_id}
-    if message.content_type == "audio":
-        return {"type": "file", "file_id": message.audio.file_id}
+def parse_media(m):
+    if m.photo:
+        return {"type": "photo", "file_id": m.photo[-1].file_id, "caption": m.caption}
+    if m.video:
+        return {"type": "video", "file_id": m.video.file_id, "caption": m.caption}
+    if m.document:
+        return {"type": "document", "file_id": m.document.file_id, "caption": m.caption}
+    if m.text:
+        return {"type": "text", "file_id": m.text, "caption": None}
     return None
 
 
@@ -276,7 +270,7 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
                         )
                     return
 
-                # PROOFS (owner/sub)
+                
                 file_group = []
                 other_msgs = []
 
@@ -624,43 +618,51 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
             return
 
     @BOT.message_handler(commands=["done"])
-    def cmd_done(m):
-        try:
-            uid = m.from_user.id
-            if not is_admin(uid):
-                return
-            st = temp_states.get(uid)
-            if not st:
-                BOT.send_message(uid, "No active operation.")
-                return
-            action = st.get("action")
-            if action == "add_loot":
-                title = st.get("title")
-                desc = st.get("description", "")
-                medias = st.get("media", [])
-                loot_id = db.add_loot(title, desc)
-                for mobj in medias:
-                    db.add_media(loot_id, "video", mobj.get("type"), file_id=mobj.get("file_id"), link=mobj.get("link"), text_msg=mobj.get("text"))
-                BOT.send_message(uid, f"✔ Loot '{title}' added with {len(medias)} media file(s).")
-                temp_states.pop(uid, None)
-                return
-            if action in ("add_owner_proof", "add_sub_proof"):
-                loot_id = st.get("loot_id")
-                proofs = st.get("proofs", [])
-                kind = "owner" if action == "add_owner_proof" else "subscriber"
-                for pobj in proofs:
-                    db.add_media(loot_id, kind, pobj.get("type"), file_id=pobj.get("file_id"), link=pobj.get("link"), text_msg=pobj.get("text"))
-                BOT.send_message(uid, f"✔ {len(proofs)} {kind} proof(s) added to loot.")
-                temp_states.pop(uid, None)
-                return
-            if action == "broadcast":
-                BOT.send_message(uid, "✔ Operation completed.")
-                temp_states.pop(uid, None)
-                return
-        except Exception as e:
-            print(f"ERROR in cmd_done: {e}")
-            traceback.print_exc()
-            BOT.send_message(uid, f"❌ Error: {str(e)}")
+    def finish_admin(m):
+        uid = m.from_user.id
+
+        st = temp_states.get(uid)
+        if not st:
+            return
+
+        action = st.get("action")
+
+    
+        if action == "add_loot":
+            title = st.get("title")
+            desc = st.get("description")
+            media = st.get("media", [])
+
+            loot_id = db.add_loot(title, desc)
+
+            for item in media:
+                db.add_media(loot_id, item["type"], item["file_id"], item["caption"])
+
+            BOT.send_message(uid, f"✔ Loot uploaded successfully!\nLoot ID: {loot_id}")
+
+            temp_states.pop(uid, None)
+            return
+
+    
+        if action == "add_owner_proof":
+            loot_id = st["loot_id"]
+            for item in st.get("proofs", []):
+                db.add_media(loot_id, "owner_proof", item["file_id"], item["caption"])
+
+            BOT.send_message(uid, "✔ Owner proofs saved.")
+            temp_states.pop(uid, None)
+            return
+
+    
+        if action == "add_sub_proof":
+            loot_id = st["loot_id"]
+            for item in st.get("proofs", []):
+                db.add_media(loot_id, "sub_proof", item["file_id"], item["caption"])
+
+            BOT.send_message(uid, "✔ Subscriber proofs saved.")
+            temp_states.pop(uid, None)
+            return
+
     @BOT.message_handler(commands=["admin"])
     def cmd_admin(m):
         if not is_admin(uid):
