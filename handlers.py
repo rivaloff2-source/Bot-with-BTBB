@@ -382,7 +382,7 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
                 _, lid = data.split("||", 1)
                 loot = db.get_loot(int(lid))
                 medias_all = db.get_media(int(lid))
-                BOT.edit_message_text(f"*{loot[1]}*\n\n{loot[2]}\n\nTotal media: {len(medias_all)}", c.message.chat.id, c.message.message_id, parse_mode="Markdown", reply_markup=admin_kb())
+                BOT.edit_message_text(f"*{loot[1]}*\n\n{loot[2]}\n\nTotal media: {len(medias_all)}", c.message.chat.id, c.message.message_id, parse_mode="Markdown", reply_markup=admin_kb(uid))
                 return
 
             if data == "admin_delete_loot":
