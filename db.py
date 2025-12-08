@@ -4,16 +4,18 @@ import os
 DB_FILE = "loots.db"
 
 conn = sqlite3.connect(DB_FILE, check_same_thread=False)
-c = conn.cursor()
 
-c.execute("""
+
+
+cur = conn.cursor()
+cur.execute("""
 CREATE TABLE IF NOT EXISTS loots (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     description TEXT
 )
 """)
-c.execute("""
+cur.execute("""
 CREATE TABLE IF NOT EXISTS media (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     loot_id INTEGER NOT NULL,
@@ -24,105 +26,133 @@ CREATE TABLE IF NOT EXISTS media (
     text_msg TEXT
 )
 """)
-c.execute("""
+cur.execute("""
 CREATE TABLE IF NOT EXISTS users (
     user_id INTEGER PRIMARY KEY
 )
 """)
-c.execute("""
+cur.execute("""
 CREATE TABLE IF NOT EXISTS admins (
-    uid INTEGER PRIMARY KEY
+    user_id INTEGER PRIMARY KEY
 )
 """)
 conn.commit()
+cur.close()
+
 
 
 def add_user(uid):
-    try:
-        c.execute("INSERT OR IGNORE INTO users (user_id) VALUES (?)", (uid,))
-        conn.commit()
-    except Exception:
-        pass
+    cur = conn.cursor()
+    cur.execute("INSERT OR IGNORE INTO users (user_id) VALUES (?)", (uid,))
+    conn.commit()
+    cur.close()
 
 
 def get_users():
-    c.execute("SELECT user_id FROM users")
-    return [row[0] for row in c.fetchall()]
+    cur = conn.cursor()
+    cur.execute("SELECT user_id FROM users")
+    rows = cur.fetchall()
+    cur.close()
+    return [r[0] for r in rows]
+
 
 
 def add_loot(title, description):
-    c.execute("INSERT INTO loots (title, description) VALUES (?,?)", (title, description))
+    cur = conn.cursor()
+    cur.execute("INSERT INTO loots (title, description) VALUES (?, ?)", (title, description))
     conn.commit()
-    return c.lastrowid
+    loot_id = cur.lastrowid
+    cur.close()
+    return loot_id
 
 
 def get_loots():
-    c.execute("SELECT id, title, description FROM loots")
-    return c.fetchall()
+    cur = conn.cursor()
+    cur.execute("SELECT id, title, description FROM loots")
+    rows = cur.fetchall()
+    cur.close()
+    return rows
 
 
 def get_loot(loot_id):
-    c.execute("SELECT id, title, description FROM loots WHERE id=?", (loot_id,))
-    return c.fetchone()
+    cur = conn.cursor()
+    cur.execute("SELECT id, title, description FROM loots WHERE id=?", (loot_id,))
+    row = cur.fetchone()
+    cur.close()
+    return row
 
 
 def delete_loot(loot_id):
-    c.execute("DELETE FROM loots WHERE id=?", (loot_id,))
-    c.execute("DELETE FROM media WHERE loot_id=?", (loot_id,))
+    cur = conn.cursor()
+    cur.execute("DELETE FROM loots WHERE id=?", (loot_id,))
+    cur.execute("DELETE FROM media WHERE loot_id=?", (loot_id,))
     conn.commit()
+    cur.close()
+
 
 
 def add_media(loot_id, kind, mtype, file_id=None, link=None, text_msg=None):
-    c.execute(
+    cur = conn.cursor()
+    cur.execute(
         "INSERT INTO media (loot_id, kind, type, file_id, link, text_msg) VALUES (?,?,?,?,?,?)",
         (loot_id, kind, mtype, file_id, link, text_msg),
     )
     conn.commit()
-    return c.lastrowid
+    media_id = cur.lastrowid
+    cur.close()
+    return media_id
 
 
 def get_media(loot_id, kind=None):
+    cur = conn.cursor()
     if kind:
-        c.execute(
+        cur.execute(
             "SELECT id, kind, type, file_id, link, text_msg FROM media WHERE loot_id=? AND kind=?",
             (loot_id, kind),
         )
     else:
-        c.execute(
+        cur.execute(
             "SELECT id, kind, type, file_id, link, text_msg FROM media WHERE loot_id=?",
             (loot_id,),
         )
-    return c.fetchall()
+    rows = cur.fetchall()
+    cur.close()
+    return rows
 
 
 def delete_media(media_id):
-    c.execute("DELETE FROM media WHERE id=?", (media_id,))
+    cur = conn.cursor()
+    cur.execute("DELETE FROM media WHERE id=?", (media_id,))
     conn.commit()
+    cur.close()
 
 
 def get_media_by_id(media_id):
-    c.execute("SELECT loot_id, kind, type, file_id, link, text_msg FROM media WHERE id=?", (media_id,))
-    
+    cur = conn.cursor()
+    cur.execute("SELECT loot_id, kind, type, file_id, link, text_msg FROM media WHERE id=?", (media_id,))
+    row = cur.fetchone()
+    cur.close()
+    return row
+
+
+
 def add_admin(uid):
-    conn2 = sqlite3.connect(DB_FILE)
-    c2 = conn2.cursor()
-    c2.execute("INSERT OR IGNORE INTO admins(uid) VALUES (?)", (uid,))
-    conn2.commit()
-    conn2.close()
+    cur = conn.cursor()
+    cur.execute("INSERT OR IGNORE INTO admins (user_id) VALUES (?)", (uid,))
+    conn.commit()
+    cur.close()
+
 
 def remove_admin(uid):
-    conn2 = sqlite3.connect(DB_FILE)
-    c2 = conn2.cursor()
-    c2.execute("DELETE FROM admins WHERE uid=?", (uid,))
-    conn2.commit()
-    conn2.close()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM admins WHERE user_id=?", (uid,))
+    conn.commit()
+    cur.close()
+
 
 def get_admins():
-    conn2 = sqlite3.connect(DB_FILE)
-    c2 = conn2.cursor()
-    c2.execute("SELECT uid FROM admins")
-    rows = c2.fetchall()
-    conn2.close()
+    cur = conn.cursor()
+    cur.execute("SELECT user_id FROM admins")
+    rows = cur.fetchall()
+    cur.close()
     return [r[0] for r in rows]
-   
-    return c.fetchone()
