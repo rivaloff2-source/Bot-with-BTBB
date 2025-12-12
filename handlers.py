@@ -211,13 +211,13 @@ def setup_handlers(bot_instance, admin_ids, required_channel, contact_bot):
                     BOT.answer_callback_query(c.id, "No loots yet.")
                     BOT.edit_message_text("No loots available currently.", c.message.chat.id, c.message.message_id, reply_markup=back_button("back_main"))
                     return
-                BOT.edit_message_text("📂 Select a loot:", c.message.chat.id, c.message.message_id, reply_markup=loots_kb())
+                BOT.edit_message_text("📂 Select a loot:", c.message.chat.id, c.message.message_id, reply_markup=loots_kb(uid))
                 return
 
             if data == "joined_check":
                 if check_joined(uid):
                     BOT.answer_callback_query(c.id, "Verified ✅")
-                    BOT.edit_message_text("Thanks — verified. Now choose a loot:", c.message.chat.id, c.message.message_id, reply_markup=loots_kb())
+                    BOT.edit_message_text("Thanks — verified. Now choose a loot:", c.message.chat.id, c.message.message_id, reply_markup=loots_kb(uid))
                 else:
                     BOT.answer_callback_query(c.id, "Still not joined.")
                 return
